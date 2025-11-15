@@ -4,6 +4,23 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import PracticePage from './page';
 
+// Next.js router のモック
+const mockPush = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+  useSearchParams: () => ({
+    get: jest.fn(),
+  }),
+  usePathname: () => '/practice',
+}));
+
 // AI生成のモック
 jest.mock('@/app/actions/ai', () => ({
   generateTypingText: jest.fn().mockResolvedValue('これはテスト用の文章です'),
@@ -116,7 +133,19 @@ describe('PracticePage', () => {
     });
   });
 
-  it('should show completion button after typing complete text', async () => {
+  it('should navigate to results after typing complete text', async () => {
+    // sessionStorageのモック
+    const setItemMock = jest.fn();
+    Object.defineProperty(window, 'sessionStorage', {
+      value: {
+        getItem: jest.fn(),
+        setItem: setItemMock,
+        removeItem: jest.fn(),
+        clear: jest.fn(),
+      },
+      writable: true,
+    });
+
     render(<PracticePage />);
 
     await waitFor(() => {
@@ -126,10 +155,11 @@ describe('PracticePage', () => {
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'これはテスト用の文章です' } });
 
-    // 完了後、リセットボタンが表示される
+    // 完了後、結果ページへ遷移する
     await waitFor(
       () => {
-        expect(screen.getByText(/もう一度挑戦/i)).toBeInTheDocument();
+        expect(mockPush).toHaveBeenCalled();
+        expect(mockPush.mock.calls[0][0]).toContain('/results');
       },
       { timeout: 3000 }
     );

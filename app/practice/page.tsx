@@ -1,16 +1,19 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { generateTypingText } from '@/app/actions/ai';
 import { calculateWPM, calculateAccuracy } from '@/lib/typing/calculator';
 import TypingArea from '@/components/TypingArea';
 import GameStats from '@/components/GameStats';
 import Timer from '@/components/Timer';
 import DifficultySelector from '@/components/DifficultySelector';
+import { KeyPress } from '@/lib/typing/analyzer';
 
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
 export default function PracticePage() {
+  const router = useRouter();
   const [difficulty, setDifficulty] = useState<Difficulty>('beginner');
   const [targetText, setTargetText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +26,7 @@ export default function PracticePage() {
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
   const [characterCount, setCharacterCount] = useState(0);
+  const [keyPresses, setKeyPresses] = useState<KeyPress[]>([]);
 
   // 文章生成
   const loadNewText = useCallback(async () => {
@@ -34,6 +38,7 @@ export default function PracticePage() {
     setCharacterCount(0);
     setWpm(0);
     setAccuracy(100);
+    setKeyPresses([]);
 
     try {
       const text = await generateTypingText(difficulty, 'sentence');
@@ -54,12 +59,25 @@ export default function PracticePage() {
   // タイピング変更時の処理
   const handleTypingChange = useCallback(
     (newTypedText: string, isCorrect: boolean) => {
+      const previousLength = typedText.length;
       setTypedText(newTypedText);
 
       // 初回入力でタイマー開始
       if (!isTimerActive && newTypedText.length === 1) {
         setIsTimerActive(true);
         setStartTime(Date.now());
+      }
+
+      // 新しく入力されたキーを記録
+      if (newTypedText.length > previousLength) {
+        const newChar = newTypedText[previousLength];
+        const expectedChar = targetText[previousLength];
+        const keyPress: KeyPress = {
+          key: newChar,
+          timestamp: Date.now(),
+          isCorrect: newChar === expectedChar,
+        };
+        setKeyPresses(prev => [...prev, keyPress]);
       }
 
       // 統計更新
@@ -78,20 +96,42 @@ export default function PracticePage() {
         setAccuracy(currentAccuracy);
       }
     },
-    [isTimerActive, startTime, targetText]
+    [isTimerActive, startTime, targetText, typedText]
   );
 
   // タイピング完了時の処理
   const handleTypingComplete = useCallback(() => {
     setIsTimerActive(false);
     setIsCompleted(true);
-  }, []);
+
+    // 結果データを sessionStorage に保存
+    sessionStorage.setItem('keyPresses', JSON.stringify(keyPresses));
+
+    // 結果ページへ遷移
+    const params = new URLSearchParams({
+      wpm: wpm.toString(),
+      accuracy: accuracy.toString(),
+      characterCount: characterCount.toString(),
+    });
+    router.push(`/results?${params.toString()}`);
+  }, [keyPresses, wpm, accuracy, characterCount, router]);
 
   // タイマー完了時の処理
   const handleTimerComplete = useCallback(() => {
     setIsTimerActive(false);
     setIsCompleted(true);
-  }, []);
+
+    // 結果データを sessionStorage に保存
+    sessionStorage.setItem('keyPresses', JSON.stringify(keyPresses));
+
+    // 結果ページへ遷移
+    const params = new URLSearchParams({
+      wpm: wpm.toString(),
+      accuracy: accuracy.toString(),
+      characterCount: characterCount.toString(),
+    });
+    router.push(`/results?${params.toString()}`);
+  }, [keyPresses, wpm, accuracy, characterCount, router]);
 
   // 難易度変更時の処理
   const handleDifficultyChange = useCallback((newDifficulty: Difficulty) => {

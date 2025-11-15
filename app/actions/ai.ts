@@ -87,3 +87,84 @@ export async function generateTypingText(
     return texts[Math.floor(Math.random() * texts.length)];
   }
 }
+
+/**
+ * タイピング結果を分析してアドバイスを生成する
+ * @param wpm Words Per Minute
+ * @param accuracy 正確性（%）
+ * @param weakKeys 苦手なキー（ミス率が高いキー）
+ * @returns AIが生成したアドバイス
+ */
+export async function analyzeTypingPerformance(
+  wpm: number,
+  accuracy: number,
+  weakKeys: string[]
+): Promise<string> {
+  // APIキーが設定されていない場合はフォールバックアドバイス
+  if (!genAI) {
+    return generateFallbackAdvice(wpm, accuracy, weakKeys);
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const prompt = `
+タイピング練習の結果を分析し、具体的な改善アドバイスを提供してください。
+
+【データ】
+- WPM（1分あたりの単語数）: ${wpm}
+- 正確性: ${accuracy}%
+- 苦手なキー: ${weakKeys.length > 0 ? weakKeys.join(', ') : 'なし'}
+
+【指示】
+- 200文字程度で簡潔に
+- 具体的な練習方法を提案
+- ポジティブかつ建設的なトーンで
+- 日本語で回答
+
+重要: アドバイスのみを返してください。前置きや説明は不要です。
+`;
+
+    const result = await model.generateContent(prompt);
+    const advice = result.response.text().trim();
+
+    return advice || generateFallbackAdvice(wpm, accuracy, weakKeys);
+  } catch (error) {
+    console.error('Error analyzing typing performance with Gemini API:', error);
+    return generateFallbackAdvice(wpm, accuracy, weakKeys);
+  }
+}
+
+/**
+ * フォールバックアドバイスを生成
+ */
+function generateFallbackAdvice(wpm: number, accuracy: number, weakKeys: string[]): string {
+  let advice = '';
+
+  // WPMに基づくアドバイス
+  if (wpm < 20) {
+    advice += 'タイピング速度を上げるには、まず正確性を重視しましょう。スピードは自然とついてきます。';
+  } else if (wpm < 40) {
+    advice += '良いペースです。キーボードを見ずにタイピングする練習を続けましょう。';
+  } else if (wpm < 60) {
+    advice += 'かなり速いタイピングです。次は正確性を100%に近づけることを目指しましょう。';
+  } else {
+    advice += '素晴らしいタイピング速度です！このペースを維持しながら、さらに正確性を高めていきましょう。';
+  }
+
+  // 正確性に基づくアドバイス
+  if (accuracy < 80) {
+    advice += '\n\n正確性を向上させるため、急がず一文字一文字を確実に入力することを心がけてください。';
+  } else if (accuracy < 95) {
+    advice += '\n\n正確性は良好です。ミスを減らすため、特定のキーパターンに注意を払いましょう。';
+  } else {
+    advice += '\n\n非常に高い正確性です！この調子で練習を続けてください。';
+  }
+
+  // 苦手なキーに基づくアドバイス
+  if (weakKeys.length > 0) {
+    advice += `\n\n苦手なキー（${weakKeys.slice(0, 3).join(', ')}）は、単独で練習することで改善できます。`;
+  }
+
+  return advice;
+}
