@@ -19,6 +19,13 @@ export default function Home() {
             練習を始める
           </Link>
 
+          <Link
+            href="/history"
+            className="block bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-lg transition-colors backdrop-blur-sm"
+          >
+            📈 履歴を見る
+          </Link>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
               <div className="text-4xl mb-3">🤖</div>

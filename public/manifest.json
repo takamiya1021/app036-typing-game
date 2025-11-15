@@ -1,11 +1,11 @@
 {
-  "name": "タイピングゲーム",
+  "name": "タイピングゲーム - AI搭載練習アプリ",
   "short_name": "タイピング",
-  "description": "AI搭載タイピング練習アプリ",
+  "description": "AI搭載のタイピング練習ゲーム。オフラインでも利用可能",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1e3a8a",
-  "theme_color": "#3b82f6",
+  "theme_color": "#1e40af",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -20,5 +20,9 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["education", "games"],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
