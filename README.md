@@ -1,35 +1,127 @@
-# タイピングゲーム
+# タイピングゲーム - AI搭載練習アプリ
 
-制限時間内に文字を正しく入力するタイピング練習ゲーム。AI機能による文章生成と苦手キー分析を搭載。
+[![Tests](https://img.shields.io/badge/tests-174%20passing-success)](https://github.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![PWA](https://img.shields.io/badge/PWA-enabled-purple)](https://web.dev/progressive-web-apps/)
 
-## 主要機能
+AI（Google Gemini）を活用したタイピング練習アプリケーション。PWA対応により、オフラインでも利用可能です。
 
-- **多様な練習コンテンツ**: ランダム文字、日本語文章、プログラミング用語
-- **3段階の難易度**: 初級、中級、上級
-- **2つのゲームモード**: 文字数チャレンジ、文章完成モード
-- **AI文章自動生成**: Google Gemini API / OpenAI APIによる練習文章自動生成
-- **AIタイピングアドバイス**: リアルタイムで上達のコツを提案
-- **苦手キー分析**: タイプミスの多いキーを検出・分析
-- **PWA対応**: オフラインでも利用可能
+## ✨ 主な機能
 
-## 技術スタック
+### 🤖 AI文章生成
+- Google Gemini APIによる練習文章の自動生成
+- 難易度別（初級・中級・上級）の最適な文章提供
 
-- Next.js 14.x / React 18.x
-- TypeScript
-- Tailwind CSS v3
-- Google Gemini API (Primary) / OpenAI API (Fallback)
-- IndexedDB (Dexie.js)
-- PWA (next-pwa)
+### 📊 詳細な統計・分析
+- **WPM（Words Per Minute）**: タイピング速度の計測
+- **正確性（Accuracy）**: 入力の正確さをパーセンテージで表示
+- **キーごとの分析**: 各キーの正誤率、平均入力時間を集計
+- **苦手キー検出**: ミス率の高いキーを自動検出
 
-## ドキュメント
+### 🎨 キーボードヒートマップ
+- キーボードを視覚化し、各キーの正誤率を色分け表示
+- ホバーで詳細な統計情報を表示
+- 指と手の割り当て情報
 
-詳細な仕様は以下を参照してください：
+### 💡 AIアドバイス
+- タイピング結果をAIが分析し改善アドバイスを提供
+- 苦手なキーに基づいたパーソナライズされたフィードバック
+
+### 📈 履歴管理
+- IndexedDBによるローカル保存
+- 過去20件のプレイ記録を保持
+- タイムスタンプ、スコア、難易度の一覧表示
+
+### ⚡ PWA対応
+- Service Workerによる完全なオフライン動作
+- ホーム画面へのインストール可能
+
+## 🛠️ 技術スタック
+
+- **Next.js 14** (App Router)
+- **React 18** / **TypeScript 5**
+- **Tailwind CSS**
+- **IndexedDB** (Dexie.js)
+- **Google Gemini API**
+- **Jest** + **React Testing Library**
+
+## 📦 セットアップ
+
+### 前提条件
+- Node.js 18.x 以上
+
+### インストール
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/yourusername/app036-typing-game.git
+cd app036-typing-game
+
+# 依存関係をインストール
+npm install
+
+# 環境変数の設定
+cp .env.local.example .env.local
+# .env.localにGoogle Gemini API Keyを設定
+
+# 開発サーバー起動
+npm run dev
+```
+
+ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
+
+### APIキーの取得
+1. [Google AI Studio](https://makersuite.google.com/app/apikey)にアクセス
+2. 新しいAPIキーを作成
+3. `.env.local`の`GOOGLE_GENERATIVE_AI_API_KEY`に設定
+
+## 🧪 テスト
+
+```bash
+# テスト実行
+npm test
+
+# カバレッジレポート
+npm test -- --coverage
+```
+
+**テスト状況**: 174テスト / 100%合格 / カバレッジ80%以上
+
+## 📁 プロジェクト構造
+
+```
+app036-typing-game/
+├── app/                      # Next.js App Router
+│   ├── actions/ai.ts         # AI API Server Actions
+│   ├── history/              # 履歴ページ
+│   ├── practice/             # 練習ページ
+│   └── results/              # 結果ページ
+├── components/               # Reactコンポーネント
+│   ├── AnalysisReport.tsx
+│   ├── KeyboardHeatmap.tsx
+│   ├── GameStats.tsx
+│   └── ...
+├── lib/
+│   ├── db/                   # IndexedDB操作
+│   ├── typing/               # タイピングロジック
+│   └── utils/                # ユーティリティ
+└── doc/                      # ドキュメント
+```
+
+## 📝 ドキュメント
+
 - [要件定義書](doc/requirements.md)
 - [技術設計書](doc/technical-design.md)
 - [実装計画書](doc/implementation-plan.md)
 
-## ターゲットユーザー
+## 📊 開発手法
 
-- タイピング初心者から上級者まで
-- プログラマー（プログラミング用語の練習）
-- タイピング速度向上を目指す全ての人
+**TDD（Test-Driven Development）**で実装
+- Red → Green → Refactor サイクル
+- Phase 0-8の段階的実装
+- 全テストパス + カバレッジ80%以上
+
+## 📄 ライセンス
+
+MIT License
