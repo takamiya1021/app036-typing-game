@@ -3,8 +3,9 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AnalysisReport from '@/components/AnalysisReport';
+import KeyboardHeatmap from '@/components/KeyboardHeatmap';
 import { analyzeTypingPerformance } from '@/app/actions/ai';
-import { analyzeKeyStats } from '@/lib/typing/analyzer';
+import { analyzeKeyStats, KeyStat } from '@/lib/typing/analyzer';
 import Link from 'next/link';
 
 function ResultsContent() {
@@ -18,6 +19,7 @@ function ResultsContent() {
 
   const [aiAdvice, setAiAdvice] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(true);
+  const [keyStats, setKeyStats] = useState<KeyStat[]>([]);
 
   useEffect(() => {
     // ブラウザ環境でのみsessionStorageにアクセス
@@ -28,10 +30,11 @@ function ResultsContent() {
     const keyPresses = keyPressesData ? JSON.parse(keyPressesData) : [];
 
     // キー統計を分析
-    const keyStats = analyzeKeyStats(keyPresses);
+    const stats = analyzeKeyStats(keyPresses);
+    setKeyStats(stats);
 
     // 苦手なキーを抽出（ミス率が30%以上のキー）
-    const weakKeys = keyStats
+    const weakKeys = stats
       .filter(stat => {
         const totalPresses = stat.correctCount + stat.missCount;
         const missRate = totalPresses > 0 ? stat.missCount / totalPresses : 0;
@@ -80,6 +83,11 @@ function ResultsContent() {
             characterCount={characterCount}
             aiAdvice={isAnalyzing ? '' : aiAdvice}
           />
+        </div>
+
+        {/* キーボードヒートマップ */}
+        <div className="mb-8">
+          <KeyboardHeatmap keyStats={keyStats} />
         </div>
 
         {/* アクションボタン */}
