@@ -6,6 +6,7 @@ import AnalysisReport from '@/components/AnalysisReport';
 import KeyboardHeatmap from '@/components/KeyboardHeatmap';
 import { analyzeTypingPerformance } from '@/app/actions/ai';
 import { analyzeKeyStats, KeyStat } from '@/lib/typing/analyzer';
+import { saveSession } from '@/lib/db/operations';
 import Link from 'next/link';
 
 function ResultsContent() {
@@ -16,6 +17,12 @@ function ResultsContent() {
   const wpm = parseInt(searchParams.get('wpm') || '0', 10);
   const accuracy = parseInt(searchParams.get('accuracy') || '0', 10);
   const characterCount = parseInt(searchParams.get('characterCount') || '0', 10);
+  const mode = searchParams.get('mode') as 'challenge' | 'completion' || 'challenge';
+  const difficulty = searchParams.get('difficulty') as 'beginner' | 'intermediate' | 'advanced' || 'beginner';
+  const textType = searchParams.get('textType') as 'random' | 'sentence' | 'programming' || 'sentence';
+  const targetText = searchParams.get('targetText') || '';
+  const typedText = searchParams.get('typedText') || '';
+  const duration = parseInt(searchParams.get('duration') || '0', 10);
 
   const [aiAdvice, setAiAdvice] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(true);
@@ -43,21 +50,55 @@ function ResultsContent() {
       .map(stat => stat.key)
       .slice(0, 5);
 
-    // AIアドバイスを生成
+    // AIアドバイスを生成してセッションを保存
     const generateAdvice = async () => {
       try {
         const advice = await analyzeTypingPerformance(wpm, accuracy, weakKeys);
         setAiAdvice(advice);
+
+        // セッションをIndexedDBに保存
+        await saveSession({
+          timestamp: Date.now(),
+          mode,
+          difficulty,
+          textType,
+          targetText,
+          typedText,
+          duration,
+          wpm,
+          accuracy,
+          keyStats: stats,
+          aiAdvice: advice,
+        });
       } catch (error) {
         console.error('Failed to generate AI advice:', error);
         setAiAdvice('アドバイスの生成に失敗しました。');
+
+        // エラーの場合でもセッションを保存（アドバイスなし）
+        try {
+          await saveSession({
+            timestamp: Date.now(),
+            mode,
+            difficulty,
+            textType,
+            targetText,
+            typedText,
+            duration,
+            wpm,
+            accuracy,
+            keyStats: stats,
+            aiAdvice: '',
+          });
+        } catch (saveError) {
+          console.error('Failed to save session:', saveError);
+        }
       } finally {
         setIsAnalyzing(false);
       }
     };
 
     generateAdvice();
-  }, [wpm, accuracy]);
+  }, [wpm, accuracy, mode, difficulty, textType, targetText, typedText, duration]);
 
   // データがない場合は練習ページへリダイレクト
   useEffect(() => {

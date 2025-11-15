@@ -107,14 +107,23 @@ export default function PracticePage() {
     // 結果データを sessionStorage に保存
     sessionStorage.setItem('keyPresses', JSON.stringify(keyPresses));
 
+    // プレイ時間を計算
+    const duration = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+
     // 結果ページへ遷移
     const params = new URLSearchParams({
       wpm: wpm.toString(),
       accuracy: accuracy.toString(),
       characterCount: characterCount.toString(),
+      mode: 'challenge',
+      difficulty: difficulty,
+      textType: 'sentence',
+      targetText: targetText,
+      typedText: typedText,
+      duration: duration.toString(),
     });
     router.push(`/results?${params.toString()}`);
-  }, [keyPresses, wpm, accuracy, characterCount, router]);
+  }, [keyPresses, wpm, accuracy, characterCount, difficulty, targetText, typedText, startTime, router]);
 
   // タイマー完了時の処理
   const handleTimerComplete = useCallback(() => {
@@ -124,14 +133,23 @@ export default function PracticePage() {
     // 結果データを sessionStorage に保存
     sessionStorage.setItem('keyPresses', JSON.stringify(keyPresses));
 
+    // プレイ時間を計算
+    const duration = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+
     // 結果ページへ遷移
     const params = new URLSearchParams({
       wpm: wpm.toString(),
       accuracy: accuracy.toString(),
       characterCount: characterCount.toString(),
+      mode: 'challenge',
+      difficulty: difficulty,
+      textType: 'sentence',
+      targetText: targetText,
+      typedText: typedText,
+      duration: duration.toString(),
     });
     router.push(`/results?${params.toString()}`);
-  }, [keyPresses, wpm, accuracy, characterCount, router]);
+  }, [keyPresses, wpm, accuracy, characterCount, difficulty, targetText, typedText, startTime, router]);
 
   // 難易度変更時の処理
   const handleDifficultyChange = useCallback((newDifficulty: Difficulty) => {
