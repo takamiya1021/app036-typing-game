@@ -1,11 +1,6 @@
 'use server';
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-// Gemini APIのクライアント初期化
-const genAI = process.env.GEMINI_API_KEY
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-  : null;
+import { GoogleGenAI } from '@google/genai';
 
 /**
  * 難易度と文章タイプに応じたプロンプトを生成
@@ -55,25 +50,34 @@ const fallbackTexts: Record<string, string[]> = {
  * タイピング練習用のテキストを生成する
  * @param difficulty 難易度（beginner, intermediate, advanced）
  * @param textType 文章タイプ（random, sentence, programming）
+ * @param apiKey ユーザーが設定したAPIキー（オプション）
  * @returns 生成されたテキスト
  */
 export async function generateTypingText(
   difficulty: string,
-  textType: string
+  textType: string,
+  apiKey?: string
 ): Promise<string> {
+  // APIキーの優先順位: ユーザー設定 > 環境変数
+  const effectiveApiKey = apiKey || process.env.GEMINI_API_KEY;
+
   // API キーが設定されていない場合はフォールバック
-  if (!genAI) {
+  if (!effectiveApiKey) {
     console.warn('GEMINI_API_KEY is not set. Using fallback text.');
     const texts = fallbackTexts[difficulty] || fallbackTexts.beginner;
     return texts[Math.floor(Math.random() * texts.length)];
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const ai = new GoogleGenAI({ apiKey: effectiveApiKey });
     const prompt = generatePrompt(difficulty, textType);
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+
+    const text = response.text || '';
 
     // 生成されたテキストをクリーンアップ（改行や余分な空白を削除）
     const cleanedText = text.trim().replace(/\n/g, '');
@@ -93,20 +97,25 @@ export async function generateTypingText(
  * @param wpm Words Per Minute
  * @param accuracy 正確性（%）
  * @param weakKeys 苦手なキー（ミス率が高いキー）
+ * @param apiKey ユーザーが設定したAPIキー（オプション）
  * @returns AIが生成したアドバイス
  */
 export async function analyzeTypingPerformance(
   wpm: number,
   accuracy: number,
-  weakKeys: string[]
+  weakKeys: string[],
+  apiKey?: string
 ): Promise<string> {
+  // APIキーの優先順位: ユーザー設定 > 環境変数
+  const effectiveApiKey = apiKey || process.env.GEMINI_API_KEY;
+
   // APIキーが設定されていない場合はフォールバックアドバイス
-  if (!genAI) {
+  if (!effectiveApiKey) {
     return generateFallbackAdvice(wpm, accuracy, weakKeys);
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const ai = new GoogleGenAI({ apiKey: effectiveApiKey });
 
     const prompt = `
 タイピング練習の結果を分析し、具体的な改善アドバイスを提供してください。
@@ -125,8 +134,12 @@ export async function analyzeTypingPerformance(
 重要: アドバイスのみを返してください。前置きや説明は不要です。
 `;
 
-    const result = await model.generateContent(prompt);
-    const advice = result.response.text().trim();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+
+    const advice = (response.text || '').trim();
 
     return advice || generateFallbackAdvice(wpm, accuracy, weakKeys);
   } catch (error) {
