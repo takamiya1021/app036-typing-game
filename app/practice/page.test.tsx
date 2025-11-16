@@ -1,7 +1,7 @@
 /**
  * 練習画面の統合テスト
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import PracticePage from './page';
 
 // Next.js router のモック
@@ -118,7 +118,7 @@ describe('PracticePage', () => {
 
     // AI生成が再度呼ばれる
     await waitFor(() => {
-      expect(generateTypingText).toHaveBeenCalledWith('intermediate', 'sentence');
+      expect(generateTypingText).toHaveBeenCalledWith('intermediate', 'sentence', undefined);
     });
   });
 
@@ -163,5 +163,24 @@ describe('PracticePage', () => {
       },
       { timeout: 3000 }
     );
+  });
+
+  it('should start countdown after input even without explicit key press handler', async () => {
+    render(<PracticePage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'あ' } });
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('00:59')).toBeInTheDocument();
+    });
   });
 });

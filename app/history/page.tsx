@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getRecentSessions } from '@/lib/db/operations';
+import { getRecentSessions, clearSessions } from '@/lib/db/operations';
 import { TypingSession } from '@/lib/db/schema';
 
 const difficultyLabels = {
@@ -37,6 +37,8 @@ function formatTimestamp(timestamp: number): string {
 export default function HistoryPage() {
   const [sessions, setSessions] = useState<TypingSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isClearing, setIsClearing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -53,6 +55,27 @@ export default function HistoryPage() {
     loadHistory();
   }, []);
 
+  const handleClearHistory = async () => {
+    if (sessions.length === 0 || isClearing) {
+      return;
+    }
+
+    const confirmed = window.confirm('履歴をすべて削除しますか？この操作は元に戻せません。');
+    if (!confirmed) return;
+
+    setIsClearing(true);
+    setErrorMessage(null);
+    try {
+      await clearSessions();
+      setSessions([]);
+    } catch (error) {
+      console.error('Failed to clear history:', error);
+      setErrorMessage('履歴の削除に失敗しました。もう一度お試しください。');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 flex items-center justify-center p-8">
@@ -68,6 +91,27 @@ export default function HistoryPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">タイピング履歴</h1>
           <p className="text-white/70">過去のプレイ記録を確認できます</p>
+          {sessions.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                onClick={handleClearHistory}
+                disabled={isClearing}
+                className={`px-5 py-2 rounded-lg font-semibold transition-colors ${
+                  isClearing
+                    ? 'bg-red-400/40 text-white/70 cursor-not-allowed'
+                    : 'bg-red-500/80 hover:bg-red-600 text-white'
+                }`}
+              >
+                履歴を削除
+              </button>
+              {isClearing && (
+                <span className="text-white/70 text-sm">削除中...</span>
+              )}
+            </div>
+          )}
+          {errorMessage && (
+            <p className="mt-3 text-red-300 text-sm">{errorMessage}</p>
+          )}
         </div>
 
         {/* 履歴リスト */}

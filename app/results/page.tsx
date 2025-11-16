@@ -7,6 +7,7 @@ import KeyboardHeatmap from '@/components/KeyboardHeatmap';
 import { analyzeTypingPerformance } from '@/app/actions/ai';
 import { analyzeKeyStats, KeyStat } from '@/lib/typing/analyzer';
 import { saveSession } from '@/lib/db/operations';
+import { getApiKey } from '@/lib/api-key';
 import Link from 'next/link';
 
 function ResultsContent() {
@@ -23,10 +24,12 @@ function ResultsContent() {
   const targetText = searchParams.get('targetText') || '';
   const typedText = searchParams.get('typedText') || '';
   const duration = parseInt(searchParams.get('duration') || '0', 10);
+  const hasInputData = characterCount > 0 && typedText.length > 0;
 
   const [aiAdvice, setAiAdvice] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [keyStats, setKeyStats] = useState<KeyStat[]>([]);
+  const [hasUserApiKey, setHasUserApiKey] = useState(false);
 
   useEffect(() => {
     // ブラウザ環境でのみsessionStorageにアクセス
@@ -39,6 +42,15 @@ function ResultsContent() {
     // キー統計を分析
     const stats = analyzeKeyStats(keyPresses);
     setKeyStats(stats);
+
+    const userApiKey = getApiKey();
+    setHasUserApiKey(!!userApiKey);
+
+    if (!hasInputData) {
+      setAiAdvice('入力データが記録されていません。タイピングを行ってから結果を確認してください。');
+      setIsAnalyzing(false);
+      return;
+    }
 
     // 苦手なキーを抽出（ミス率が30%以上のキー）
     const weakKeys = stats
@@ -53,7 +65,7 @@ function ResultsContent() {
     // AIアドバイスを生成してセッションを保存
     const generateAdvice = async () => {
       try {
-        const advice = await analyzeTypingPerformance(wpm, accuracy, weakKeys);
+        const advice = await analyzeTypingPerformance(wpm, accuracy, weakKeys, userApiKey || undefined);
         setAiAdvice(advice);
 
         // セッションをIndexedDBに保存
@@ -98,7 +110,7 @@ function ResultsContent() {
     };
 
     generateAdvice();
-  }, [wpm, accuracy, mode, difficulty, textType, targetText, typedText, duration]);
+  }, [hasInputData, wpm, accuracy, mode, difficulty, textType, targetText, typedText, duration]);
 
   // データがない場合は練習ページへリダイレクト
   useEffect(() => {
@@ -115,6 +127,15 @@ function ResultsContent() {
           <h1 className="text-4xl font-bold text-white mb-2">タイピング結果</h1>
           <p className="text-white/70">お疲れ様でした！</p>
         </div>
+
+        {/* APIキー未設定警告 */}
+        {!hasUserApiKey && (
+          <div className="mb-6 bg-red-500/10 border border-red-500 rounded-lg p-4">
+            <p className="text-red-500 text-center font-medium">
+              ⚠️ APIキーが設定されていません。デフォルトの内容で回答しています。
+            </p>
+          </div>
+        )}
 
         {/* 分析レポート */}
         <div className="mb-8">

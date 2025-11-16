@@ -7,6 +7,7 @@ interface TypingAreaProps {
   targetText: string;
   onTypingComplete?: () => void;
   onTypingChange?: (typedText: string, isCorrect: boolean) => void;
+  onKeyPress?: (key: string, timestamp: number) => void;
 }
 
 /**
@@ -31,6 +32,7 @@ export default function TypingArea({
   targetText,
   onTypingComplete,
   onTypingChange,
+  onKeyPress,
 }: TypingAreaProps) {
   const [typedText, setTypedText] = useState('');
 
@@ -38,6 +40,73 @@ export default function TypingArea({
   useEffect(() => {
     setTypedText('');
   }, [targetText]);
+
+  // KeyboardEvent.codeを正規化した文字に変換
+  const normalizeKeyCode = (code: string): string | null => {
+    // 英字キー（KeyA～KeyZ → a～z）
+    if (code.startsWith('Key')) {
+      return code.substring(3).toLowerCase();
+    }
+    // 数字キー（Digit0～Digit9 → 0～9）
+    if (code.startsWith('Digit')) {
+      return code.substring(5);
+    }
+    // 記号キー
+    const symbolMap: Record<string, string> = {
+      'Space': ' ',
+      'Comma': ',',
+      'Period': '.',
+      'Slash': '/',
+      'Semicolon': ';',
+      'Quote': "'",
+      'BracketLeft': '[',
+      'BracketRight': ']',
+      'Backslash': '\\',
+      'Minus': '-',
+      'Equal': '=',
+    };
+    if (symbolMap[code]) {
+      return symbolMap[code];
+    }
+    // Backspace（削除キー）
+    if (code === 'Backspace') {
+      return 'Backspace';
+    }
+    return null;
+  };
+
+  // キー押下ハンドラー（物理的なキー入力を記録）
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // 制御キーは無視
+      if (
+        e.code === 'ShiftLeft' ||
+        e.code === 'ShiftRight' ||
+        e.code === 'ControlLeft' ||
+        e.code === 'ControlRight' ||
+        e.code === 'AltLeft' ||
+        e.code === 'AltRight' ||
+        e.code === 'MetaLeft' ||
+        e.code === 'MetaRight' ||
+        e.code === 'CapsLock' ||
+        e.code === 'Tab' ||
+        e.code === 'Escape'
+      ) {
+        return;
+      }
+
+      // KeyboardEvent.codeを正規化
+      const normalizedKey = normalizeKeyCode(e.code);
+      if (!normalizedKey) {
+        return;
+      }
+
+      if (onKeyPress) {
+        onKeyPress(normalizedKey, Date.now());
+      }
+    },
+    [onKeyPress]
+  );
 
   // 入力ハンドラー（メモ化）
   const handleInputChange = useCallback(
@@ -107,6 +176,7 @@ export default function TypingArea({
         type="text"
         value={typedText}
         onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
         className="w-full px-4 py-3 text-2xl font-mono border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white/10 text-white"
         placeholder="ここに入力..."
         autoFocus

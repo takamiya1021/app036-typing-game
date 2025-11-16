@@ -125,6 +125,13 @@ export async function deleteSession(id: string): Promise<void> {
 }
 
 /**
+ * すべてのセッションを削除
+ */
+export async function clearSessions(): Promise<void> {
+  await db.sessions.clear();
+}
+
+/**
  * ユーザー設定を取得（存在しない場合はデフォルトを返す）
  * @returns ユーザー設定
  */
