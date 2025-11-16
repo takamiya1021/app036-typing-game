@@ -4,8 +4,8 @@
   "description": "AI搭載のタイピング練習ゲーム。オフラインでも利用可能",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#14192c",
-  "theme_color": "#14192c",
+  "background_color": "#0b1226",
+  "theme_color": "#0b1226",
   "orientation": "portrait-primary",
   "icons": [
     {
