@@ -7,9 +7,9 @@ import { GoogleGenAI } from '@google/genai';
  */
 function generatePrompt(difficulty: string, textType: string): string {
   const basePrompts: Record<string, string> = {
-    beginner: '日本語の短文（20-30文字）を生成してください。常用漢字のみを使用し、シンプルで読みやすい文章にしてください。',
-    intermediate: '日本語の中文（40-60文字）を生成してください。記号（、。！？）を含む自然な文章にしてください。',
-    advanced: '日本語の長文（80-120文字）を生成してください。複雑な表現や記号を含む、読み応えのある文章にしてください。',
+    beginner: '日本語の短文（20-35文字）を生成してください。ひらがなを多めにし、小学校低学年レベルの簡単な漢字のみを使用してください。難しい言葉は避けてください。',
+    intermediate: '日本語の中文（80-120文字）を生成してください。中学生レベルの漢字を含み、句読点（、。）を適切に使用した、読み応えのある自然な文章にしてください。',
+    advanced: '日本語の超長文（200-280文字）を生成してください。高校生以上のレベルの漢字、四字熟語、カタカナ語、複雑な表現を含めてください。論理的で知的な文章にしてください。',
   };
 
   const typeModifiers: Record<string, string> = {
