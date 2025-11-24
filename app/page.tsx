@@ -26,28 +26,28 @@ export default function Home() {
             📈 履歴を見る
           </Link>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="text-4xl mb-3">🤖</div>
-              <h3 className="text-white font-bold mb-2">AI文章生成</h3>
-              <p className="text-white/70 text-sm">
-                難易度に合わせた練習文章をAIが自動生成
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 border-t border-white/10 pt-12">
+            <div className="p-2">
+              <div className="text-4xl mb-4 bg-white/5 w-20 h-20 mx-auto flex items-center justify-center rounded-full shadow-inner border border-white/10">🤖</div>
+              <h3 className="text-white font-bold mb-2 text-lg">AI文章生成</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                難易度に合わせた練習文章を<br/>AIが自動生成
               </p>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="text-4xl mb-3">📊</div>
-              <h3 className="text-white font-bold mb-2">詳細な統計</h3>
-              <p className="text-white/70 text-sm">
-                WPM、正確性、キーごとの分析
+            <div className="p-2">
+              <div className="text-4xl mb-4 bg-white/5 w-20 h-20 mx-auto flex items-center justify-center rounded-full shadow-inner border border-white/10">📊</div>
+              <h3 className="text-white font-bold mb-2 text-lg">詳細な統計</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                WPM、正確性、<br/>キーごとの分析
               </p>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="text-4xl mb-3">⚡</div>
-              <h3 className="text-white font-bold mb-2">オフライン対応</h3>
-              <p className="text-white/70 text-sm">
-                PWA対応で、どこでも練習可能
+            <div className="p-2">
+              <div className="text-4xl mb-4 bg-white/5 w-20 h-20 mx-auto flex items-center justify-center rounded-full shadow-inner border border-white/10">⚡</div>
+              <h3 className="text-white font-bold mb-2 text-lg">オフライン対応</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                PWA対応で、<br/>どこでも練習可能
               </p>
             </div>
           </div>
