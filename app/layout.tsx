@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import DeviceNotice from "@/components/DeviceNotice";
 
 export const metadata: Metadata = {
   title: "タイピングゲーム",
@@ -25,7 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <DeviceNotice />
+        {children}
+      </body>
     </html>
   );
 }

@@ -85,22 +85,21 @@ export default function HistoryPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* ヘッダー */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">タイピング履歴</h1>
-          <p className="text-white/70">過去のプレイ記録を確認できます</p>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 md:mb-4">タイピング履歴</h1>
+          <p className="text-white/70 text-sm md:text-base">過去のプレイ記録を確認できます</p>
           {sessions.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-3">
               <button
                 onClick={handleClearHistory}
                 disabled={isClearing}
-                className={`px-5 py-2 rounded-lg font-semibold transition-colors ${
-                  isClearing
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors text-sm md:text-base ${isClearing
                     ? 'bg-red-400/40 text-white/70 cursor-not-allowed'
                     : 'bg-red-500/80 hover:bg-red-600 text-white'
-                }`}
+                  }`}
               >
                 履歴を削除
               </button>
@@ -116,11 +115,11 @@ export default function HistoryPage() {
 
         {/* 履歴リスト */}
         {sessions.length === 0 ? (
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl p-12 text-center">
-            <p className="text-xl text-white/70 mb-6">履歴がありません</p>
+          <div className="bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl p-8 md:p-12 text-center">
+            <p className="text-lg md:text-xl text-white/70 mb-6">履歴がありません</p>
             <Link
               href="/practice"
-              className="inline-block px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors"
+              className="inline-block px-6 py-3 md:px-8 md:py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors"
             >
               練習を始める
             </Link>
@@ -130,39 +129,39 @@ export default function HistoryPage() {
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 hover:bg-white/10 transition-colors"
+                className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-4 md:p-6 hover:bg-white/10 transition-colors"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   {/* 左側: 統計情報 */}
-                  <div className="flex items-center gap-8">
+                  <div className="flex items-center justify-between md:justify-start gap-4 md:gap-8 w-full md:w-auto">
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-white">
+                      <div className="text-2xl md:text-3xl font-bold text-white">
                         {session.wpm}
                       </div>
-                      <div className="text-sm text-white/60">WPM</div>
+                      <div className="text-xs md:text-sm text-white/60">WPM</div>
                     </div>
 
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-white">
+                      <div className="text-2xl md:text-3xl font-bold text-white">
                         {session.accuracy}%
                       </div>
-                      <div className="text-sm text-white/60">正確性</div>
+                      <div className="text-xs md:text-sm text-white/60">正確性</div>
                     </div>
 
                     <div className="text-left">
-                      <div className="text-white font-medium">
+                      <div className="text-white font-medium text-sm md:text-base">
                         {difficultyLabels[session.difficulty]} ·{' '}
                         {modeLabels[session.mode]}
                       </div>
-                      <div className="text-sm text-white/60">
+                      <div className="text-xs md:text-sm text-white/60">
                         {session.duration}秒
                       </div>
                     </div>
                   </div>
 
                   {/* 右側: タイムスタンプ */}
-                  <div className="text-right">
-                    <div className="text-white/70 text-sm">
+                  <div className="text-right border-t border-white/10 pt-2 md:border-t-0 md:pt-0">
+                    <div className="text-white/70 text-xs md:text-sm">
                       {formatTimestamp(session.timestamp)}
                     </div>
                   </div>
@@ -170,8 +169,8 @@ export default function HistoryPage() {
 
                 {/* AIアドバイス（あれば表示） */}
                 {session.aiAdvice && (
-                  <div className="mt-4 pt-4 border-t border-white/10">
-                    <div className="text-sm text-white/80">
+                  <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-white/10">
+                    <div className="text-xs md:text-sm text-white/80">
                       💡 {session.aiAdvice}
                     </div>
                   </div>
@@ -182,16 +181,16 @@ export default function HistoryPage() {
         )}
 
         {/* ナビゲーションボタン */}
-        <div className="mt-8 flex gap-4 justify-center">
+        <div className="mt-8 flex flex-col md:flex-row gap-4 justify-center">
           <Link
             href="/practice"
-            className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors"
+            className="px-8 py-3 md:py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors text-center"
           >
             練習する
           </Link>
           <Link
             href="/"
-            className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg transition-colors backdrop-blur-sm"
+            className="px-8 py-3 md:py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg transition-colors backdrop-blur-sm text-center"
           >
             ホームへ戻る
           </Link>

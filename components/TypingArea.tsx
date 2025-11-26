@@ -167,7 +167,7 @@ export default function TypingArea({
   return (
     <div className="w-full max-w-4xl mx-auto p-8">
       {/* 目標テキスト表示 */}
-      <div className="text-4xl font-mono tracking-wider mb-8">
+      <div className="text-2xl md:text-4xl font-mono tracking-wider mb-6 md:mb-8 break-all">
         {renderedCharacters}
       </div>
 
@@ -177,7 +177,7 @@ export default function TypingArea({
         value={typedText}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        className="w-full px-4 py-3 text-2xl font-mono border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white/10 text-white"
+        className="w-full px-3 py-2 md:px-4 md:py-3 text-lg md:text-2xl font-mono border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white/10 text-white"
         placeholder="ここに入力..."
         autoFocus
       />

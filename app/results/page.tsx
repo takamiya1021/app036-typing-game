@@ -120,25 +120,25 @@ function ResultsContent() {
   }, [wpm, accuracy, characterCount, router]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 flex items-center justify-center p-8">
-      <div className="bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-4xl w-full">
+    <main className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 flex items-center justify-center p-4 md:p-8">
+      <div className="bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl p-4 md:p-8 max-w-4xl w-full">
         {/* ヘッダー */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">タイピング結果</h1>
-          <p className="text-white/70">お疲れ様でした！</p>
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">タイピング結果</h1>
+          <p className="text-white/70 text-sm md:text-base">お疲れ様でした！</p>
         </div>
 
         {/* APIキー未設定警告 */}
         {!hasUserApiKey && (
           <div className="mb-6 bg-red-500/10 border border-red-500 rounded-lg p-4">
-            <p className="text-red-500 text-center font-medium">
+            <p className="text-red-500 text-center font-medium text-sm md:text-base">
               ⚠️ APIキーが設定されていません。デフォルトの内容で回答しています。
             </p>
           </div>
         )}
 
         {/* 分析レポート */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <AnalysisReport
             wpm={wpm}
             accuracy={accuracy}
@@ -148,21 +148,21 @@ function ResultsContent() {
         </div>
 
         {/* キーボードヒートマップ */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8 overflow-hidden">
           <KeyboardHeatmap keyStats={keyStats} />
         </div>
 
         {/* アクションボタン */}
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col md:flex-row gap-4 justify-center">
           <Link
             href="/practice"
-            className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors"
+            className="px-8 py-3 md:py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors text-center"
           >
             もう一度挑戦
           </Link>
           <Link
             href="/"
-            className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg transition-colors backdrop-blur-sm"
+            className="px-8 py-3 md:py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg transition-colors backdrop-blur-sm text-center"
           >
             ホームへ戻る
           </Link>

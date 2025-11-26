@@ -141,7 +141,7 @@ export default function KeyboardHeatmap({ keyStats }: KeyboardHeatmapProps) {
       {/* キーボード */}
       <div
         data-testid="keyboard-heatmap"
-        className="bg-gray-100 p-4 rounded-lg inline-block"
+        className="bg-gray-100 p-2 md:p-4 rounded-lg inline-block min-w-full overflow-x-auto"
       >
         <KeyboardRow keys={keyboardLayout.row1} rowNumber={1} />
         <KeyboardRow keys={keyboardLayout.row2} rowNumber={2} />

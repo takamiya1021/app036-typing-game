@@ -4,17 +4,16 @@
 import { generateTypingText } from './ai';
 
 // Google Gemini APIのモック
-jest.mock('@google/generative-ai', () => {
+// Google Gemini APIのモック
+jest.mock('@google/genai', () => {
   return {
-    GoogleGenerativeAI: jest.fn().mockImplementation(() => {
+    GoogleGenAI: jest.fn().mockImplementation(() => {
       return {
-        getGenerativeModel: jest.fn().mockReturnValue({
+        models: {
           generateContent: jest.fn().mockResolvedValue({
-            response: {
-              text: jest.fn().mockReturnValue('モック生成文章'),
-            },
+            text: 'モック生成文章',
           }),
-        }),
+        },
       };
     }),
   };
